@@ -1,0 +1,16 @@
+# Стартовый скрипт этапа 3: все команды и ошибки
+# ls (заглушка): без аргументов, с ключом, с кавычками
+ls
+ls -l
+ls "my folder" file.txt
+# cd (заглушка): путь, путь с пробелами, без аргументов
+cd /home/user/projects/app
+cd "dir with spaces"
+cd
+# ошибки
+foo bar
+exit extra
+ls "unclosed
+# команда после ошибок и выход
+ls /end
+exit

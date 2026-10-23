@@ -1,0 +1,12 @@
+path,type,content
+/home,dir,
+/home/user,dir,
+/home/user/projects,dir,
+/home/user/projects/app,dir,
+/home/user/projects/app/main.py,file,cHJpbnQoMSk=
+/home/user/projects/app/lib,dir,
+/home/user/projects/app/lib/util.py,file,ZGVmIGYoKTogcGFzcw==
+/home/user/photo.jpg,file,ZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXp7
+/etc,dir,
+/etc/config.cfg,file,a2V5PXZhbHVl
+/empty,dir,
