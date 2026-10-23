@@ -59,3 +59,12 @@ class VFS:
                 else:
                     files += 1
         return dirs, files
+
+    def find(self, abspath):
+        """Возвращает элемент по абсолютному пути или None."""
+        node = self.root
+        for part in [item for item in abspath.split("/") if item]:
+            if not node.is_dir or part not in node.children:
+                return None
+            node = node.children[part]
+        return node

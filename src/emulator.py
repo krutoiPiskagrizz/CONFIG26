@@ -1,13 +1,15 @@
-"""Эмулятор оболочки. Этап 3: VFS в памяти из CSV."""
+"""Точка входа эмулятора оболочки."""
 import argparse
-import os
 import sys
 
-from commands import EXIT_OK, repl, run_script
+from shell import Shell
 from vfs import VFS, VfsError
 
+EXIT_OK = 0
 EXIT_VFS_ERROR = 1
 VFS_HELP = "путь к CSV-файлу с VFS"
+
+
 def parse_args():
     """Разбирает параметры командной строки."""
     parser = argparse.ArgumentParser(description="Эмулятор оболочки UNIX")
@@ -17,14 +19,14 @@ def parse_args():
 
 
 def print_params(args):
-    """Отладочный вывод всех заданных параметров."""
+    """Печатает заданные параметры запуска."""
     print("[debug] Параметры запуска:")
     print(f"[debug]   vfs    = {args.vfs}")
     print(f"[debug]   script = {args.script}")
 
 
 def load_vfs(path):
-    """Загружает VFS и печатает отладочную сводку; None при ошибке."""
+    """Загружает VFS и печатает сводку; None при ошибке."""
     try:
         vfs = VFS.from_csv(path)
     except VfsError as err:
@@ -37,16 +39,16 @@ def load_vfs(path):
 
 
 def main():
-    """Загружает VFS, выполняет скрипт и запускает REPL."""
+    """Загружает VFS и запускает оболочку."""
     args = parse_args()
     print_params(args)
     vfs = load_vfs(args.vfs)
     if vfs is None:
         return EXIT_VFS_ERROR
-    prompt = f"user@{vfs.name}:/$ "
+    shell = Shell(vfs)
     if args.script:
-        run_script(args.script, prompt)
-    repl(prompt)
+        shell.run_script(args.script)
+    shell.repl()
     return EXIT_OK
 
 
