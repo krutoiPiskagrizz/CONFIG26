@@ -1,15 +1,35 @@
 """Диспетчер команд оболочки."""
 import shlex
 
-from command_utils import ShellError
-from file_commands import cmd_cd, cmd_ls
+from command_utils import ShellError, no_args
+from file_commands import cmd_cd, cmd_ls, cmd_rm
 from system_commands import cmd_cal, cmd_exit, cmd_uptime
+
+COMMAND_HELP = {
+    "ls": ("ls [-l] [путь...]", "список содержимого каталога"),
+    "cd": ("cd [путь]", "сменить каталог"),
+    "uptime": ("uptime", "время работы эмулятора"),
+    "cal": ("cal [[месяц] год]", "календарь"),
+    "rm": ("rm [-r] путь...", "удалить файлы или каталоги"),
+    "help": ("help", "список команд с описанием"),
+    "exit": ("exit", "выйти из эмулятора"),
+}
+
+
+def cmd_help(shell, args):
+    """Выводит список команд с описанием."""
+    no_args("help", args)
+    for usage, text in COMMAND_HELP.values():
+        print(f"  {usage:<22} {text}")
+
 
 COMMANDS = {
     "ls": cmd_ls,
     "cd": cmd_cd,
     "uptime": cmd_uptime,
     "cal": cmd_cal,
+    "rm": cmd_rm,
+    "help": cmd_help,
     "exit": cmd_exit,
 }
 
