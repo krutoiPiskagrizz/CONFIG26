@@ -1,75 +1,38 @@
-"""Эмулятор оболочки. Этап 1: REPL (минимальный прототип)."""
-import shlex
+"""Эмулятор оболочки. Этап 2: конфигурация и скрипт."""
+import argparse
+import os
 import sys
 
+from commands import repl, run_script
+
 EXIT_OK = 0
-PROMPT = "user@vfs:/$ "
-
-class ShellError(Exception):
-    """Ошибка выполнения команды."""
+VFS_HELP = "путь к физическому расположению VFS"
 
 
-def cmd_ls(args):
-    """Заглушка ls: печатает имя команды и аргументы."""
-    print("ls", args)
+def parse_args():
+    """Разбирает параметры командной строки."""
+    parser = argparse.ArgumentParser(description="Эмулятор оболочки UNIX")
+    parser.add_argument("--vfs", required=True, help=VFS_HELP)
+    parser.add_argument("--script", help="путь к стартовому скрипту")
+    return parser.parse_args()
 
 
-def cmd_cd(args):
-    """Заглушка cd: печатает имя команды и аргументы."""
-    print("cd", args)
-
-
-def cmd_exit(args):
-    """Завершает работу эмулятора."""
-    sys.exit(EXIT_OK)
-
-
-COMMANDS = {"ls": cmd_ls, "cd": cmd_cd, "exit": cmd_exit}
-
-
-def execute(line):
-    """Разбирает строку (с учётом кавычек) и выполняет команду."""
-    try:
-        argv = shlex.split(line)
-    except ValueError as err:
-        raise ShellError(f"ошибка разбора: {err}")
-    if not argv:
-        return
-    name, args = argv[0], argv[1:]
-    if name not in COMMANDS:
-        raise ShellError(f"{name}: команда не найдена")
-    if name == "exit" and args:
-        raise ShellError("exit: команда не принимает аргументов")
-    COMMANDS[name](args)
-
-
-def read_line(prompt):
-    """Читает строку ввода; None означает конец ввода (Ctrl+D)."""
-    try:
-        return input(prompt)
-    except EOFError:
-        print()
-        return None
-    except KeyboardInterrupt:
-        print()
-        return ""
-
-
-def repl(prompt):
-    """Интерактивный цикл: ввод команды, выполнение, вывод ошибок."""
-    while True:
-        line = read_line(prompt)
-        if line is None:
-            break
-        try:
-            execute(line)
-        except ShellError as err:
-            print(err, file=sys.stderr)
+def print_params(args):
+    """Отладочный вывод всех заданных параметров."""
+    print("[debug] Параметры запуска:")
+    print(f"[debug]   vfs    = {args.vfs}")
+    print(f"[debug]   script = {args.script}")
 
 
 def main():
-    """Запускает REPL с приглашением, содержащим имя VFS."""
-    repl(PROMPT)
+    """Выводит параметры, выполняет скрипт и запускает REPL."""
+    args = parse_args()
+    print_params(args)
+    name = os.path.splitext(os.path.basename(args.vfs))[0] or "vfs"
+    prompt = f"user@{name}:/$ "
+    if args.script:
+        run_script(args.script, prompt)
+    repl(prompt)
     return EXIT_OK
 
 

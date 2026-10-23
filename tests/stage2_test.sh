@@ -1,7 +1,12 @@
+#!/bin/bash
+# Этап 2: параметры командной строки и скрипт
+# В конце выводится итог: были ли ошибки в самих тестах.
 cd "$(dirname "$0")/.."
 
 FAILED=0
 
+# run_test <описание> <ожидаемый код> <ожидаемый текст в выводе> <args...>
+# Ввод эмулятору берётся из переменной INPUT (по умолчанию: exit).
 run_test() {
     local title="$1" expected="$2" pattern="$3"
     shift 3
@@ -25,17 +30,13 @@ run_test() {
     echo
 }
 
-INPUT=$'ls\ncd /home\nls -l "my folder" file.txt\nexit' \
-    run_test "1. Заглушки ls и cd печатают имя и аргументы" 0 "ls \[" 
-INPUT=$'ls "my folder" a.txt\nexit' \
-    run_test "2. Аргумент в кавычках - один аргумент" 0 "my folder" 
-INPUT=$'foo\nexit' \
-    run_test "3. Ошибка: неизвестная команда" 0 "команда не найдена" 
-INPUT=$'exit extra\nexit' \
-    run_test "4. Ошибка: неверные аргументы exit" 0 "не принимает" 
-INPUT=$'ls "unclosed\nexit' \
-    run_test "5. Ошибка: незакрытая кавычка" 0 "ошибка разбора" 
-run_test "6. Приглашение содержит имя VFS" 0 "user@vfs:/\\$"
+run_test "1. Только --vfs" 0 "script = None" --vfs vfs/minimal.csv
+run_test "2. --vfs и --script" 0 "команда не найдена" \
+    --vfs vfs/minimal.csv --script tests/start.emu
+run_test "3. Несуществующий скрипт" 0 "не удалось открыть скрипт" \
+    --vfs vfs/minimal.csv --script tests/no_such.emu
+run_test "4. Нет обязательного --vfs (ожидается ошибка)" 2 "required" \
+    --script tests/start.emu
 
 echo "=============================="
 if [ "$FAILED" -eq 0 ]; then
